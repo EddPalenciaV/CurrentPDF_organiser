@@ -436,9 +436,9 @@ if __name__ == "__main__":
     else:
         application_path = os.path.dirname(os.path.abspath(__file__))
     
-    show_splash_screen()
+    #show_splash_screen()
     
-    is_Destination(directory)
+    #is_Destination(directory)
 
     organise_C_alphabetical()
     organise_C_numerical()

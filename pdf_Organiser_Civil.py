@@ -158,7 +158,7 @@ if __name__ == "__main__":
     else:
         application_path = os.path.dirname(os.path.abspath(__file__))
     
-    is_McVeigh(directory)
+    #is_McVeigh(directory)
     organise_C_alphabetical()
     organise_C_numerical()
     compare_C_NumAlpha()
