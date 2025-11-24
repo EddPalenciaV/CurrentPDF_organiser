@@ -1,4 +1,4 @@
-# Program Summary - Made by Edd Palencia Vanegas
+# Program Summary - Made by Edd Palencia-Vanegas
 # 1. Checks if system has python and if there are errors.
 # 2. Checks if the program is running in destination address
 # 3. Looks for civil, architectural and structural PDF drawings
@@ -77,13 +77,13 @@ def show_splash_screen():
     splash_root.after(2000, splash_root.destroy)  # Destroy the splash screen after 2 seconds
     splash_root.mainloop()
 
-# VERIFY IF INSIDE MCVEIGH CONSULTANTS
-def is_McVeigh(d):
-    mcV = "M:\Synergy\Projects"    
-    if mcV in d:
-        print("This program is being executed in McVeigh Consultants system")
+# VERIFY IF CORRECT DESTINATION
+def is_Destination(d):
+    destCompany = "M:\Synergy\Projects"    
+    if destCompany in d:
+        print("This program is being executed in correct company system")
     else:
-        print("\nThis program has stopped because this is not a McVeigh Consultants system. \n\nDo not promote piracy!")
+        print("\nThis program has stopped because this is not a valid system. \n\nDo not promote piracy!")
         input()
         sys.exit()
 
@@ -438,7 +438,7 @@ if __name__ == "__main__":
     
     show_splash_screen()
     
-    is_McVeigh(directory)
+    is_Destination(directory)
 
     organise_C_alphabetical()
     organise_C_numerical()
