@@ -21,9 +21,11 @@ from datetime import datetime
 # locate_path = os.path.dirname(os.path.realpath(__file__))
 # directory = os.path.join(locate_path)
 
-# Define the directory where the PDF files are located
-path = os.path.abspath(".")
-directory = os.path.join(path)
+def is_currentDirectory():
+    # Define the directory where the PDF files are located
+    path = os.path.abspath(".")
+    directory = os.path.join(path)
+    return directory
 
 # Pattern that identifies a civil drawing
 civil_Pattern = r'-C-'
@@ -32,14 +34,17 @@ arch_Pattern = r'-A-'
 # Pattern that identifies a structural drawing
 struct_Pattern = r'-S-'
 
-# Get the current date from the system
-current_date = datetime.now()
-# Format the date as a string in the order: last two digits of the year, two digits month, and two digits day
-current_Date = current_date.strftime("%y%m%d")
+def set_SS_directory(department):
+    # Get the current date from the system
+    get_date = datetime.now()
+    # Format the date as a string in the order: last two digits of the year, two digits month, and two digits day
+    set_Date = get_date.strftime("%y%m%d")
 
-# Ensure the _SS directory exists
-ss_directory = os.path.join(directory, "_SS")
-os.makedirs(ss_directory, exist_ok=True)
+    # Ensure the _SS directory exists
+    ss_directory = os.path.join(directory, "_SS")
+    os.makedirs(ss_directory, exist_ok=True)
+
+    return ss_directory
 
 def resource_path(relative_path):
     """Get the absolute path to a resource, works for dev and for PyInstaller."""
@@ -89,7 +94,7 @@ def is_Destination(d):
 
 ################################################################################## CIVIL ############################################################################
 # THIS FUNCTION GROUPS AND ORGANISES .PDF FILES BY THEIR ALPHABETICAL VALUE INSIDE THE BRACKETS ------------------------------
-def organise_C_alphabetical():
+def organise_C_alphabetical():    
     # Function to extract the alphabetic value within square brackets
     def extract_alpha_value(filename):
         match = re.search(r'\[([a-zA-Z])\]', filename)
@@ -134,11 +139,7 @@ def organise_C_numerical():
 
     # Function to get the base name without the value in square brackets
     def get_base_name(filename):
-        return re.sub(r'\[\d+\]', '', filename) 
-
-    # Ensure the _SS directory exists
-    ss_directory = os.path.join(directory, "_SS")
-    os.makedirs(ss_directory, exist_ok=True)
+        return re.sub(r'\[\d+\]', '', filename)     
 
     # Dictionary to store files by their base name
     files_dict = {}
@@ -169,10 +170,6 @@ def compare_C_NumAlpha():
 
     # Initialize a dictionary to store the file names
     files = {}
-
-    # Ensure the _SS directory exists
-    ss_directory = os.path.join(directory, "_SS")
-    os.makedirs(ss_directory, exist_ok=True)
 
     # Iterate over the files in the directory
     for filename in os.listdir(directory):
@@ -211,10 +208,6 @@ def organise_A_alphabetical():
     def get_base_name(filename):
         return re.sub(r'\[[a-zA-Z]\]', '', filename)
 
-    # Ensure the _SS directory exists
-    ss_directory = os.path.join(directory, "_SS")
-    os.makedirs(ss_directory, exist_ok=True)
-
     # Dictionary to store files by their base name
     files_dict = {}
 
@@ -250,10 +243,6 @@ def organise_A_numerical():
     def get_base_name(filename):
         return re.sub(r'\[\d+\]', '', filename) 
 
-    # Ensure the _SS directory exists
-    ss_directory = os.path.join(directory, "_SS")
-    os.makedirs(ss_directory, exist_ok=True)
-
     # Dictionary to store files by their base name
     files_dict = {}
 
@@ -283,10 +272,6 @@ def compare_A_NumAlpha():
 
     # Initialize a dictionary to store the file names
     files = {}
-
-    # Ensure the _SS directory exists
-    ss_directory = os.path.join(directory, "_SS")
-    os.makedirs(ss_directory, exist_ok=True)
 
     # Iterate over the files in the directory
     for filename in os.listdir(directory):
@@ -325,10 +310,6 @@ def organise_S_alphabetical():
     def get_base_name(filename):
         return re.sub(r'\[[a-zA-Z]\]', '', filename)
 
-    # Ensure the _SS directory exists
-    ss_directory = os.path.join(directory, "_SS")
-    os.makedirs(ss_directory, exist_ok=True)
-
     # Dictionary to store files by their base name
     files_dict = {}
 
@@ -364,10 +345,6 @@ def organise_S_numerical():
     def get_base_name(filename):
         return re.sub(r'\[\d+\]', '', filename) 
 
-    # Ensure the _SS directory exists
-    ss_directory = os.path.join(directory, "_SS")
-    os.makedirs(ss_directory, exist_ok=True)
-
     # Dictionary to store files by their base name
     files_dict = {}
 
@@ -397,10 +374,6 @@ def compare_S_NumAlpha():
 
     # Initialize a dictionary to store the file names
     files = {}
-
-    # Ensure the _SS directory exists
-    ss_directory = os.path.join(directory, "_SS")
-    os.makedirs(ss_directory, exist_ok=True)
 
     # Iterate over the files in the directory
     for filename in os.listdir(directory):
@@ -439,6 +412,15 @@ if __name__ == "__main__":
     #show_splash_screen()
     
     #is_Destination(directory)
+    
+    directory = is_currentDirectory()
+
+    #temp
+    ss_directory = set_SS_directory()
+
+    ss_Civil_directory = set_SS_directory("civil")
+    ss_Arch_directory = set_SS_directory("architectural")
+    ss_Struct_directory = set_SS_directory("structural")
 
     organise_C_alphabetical()
     organise_C_numerical()
