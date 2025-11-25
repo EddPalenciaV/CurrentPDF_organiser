@@ -34,14 +34,28 @@ arch_Pattern = r'-A-'
 # Pattern that identifies a structural drawing
 struct_Pattern = r'-S-'
 
+#TODO: Get parameter "department" to select which superseded folder will be created
 def set_SS_directory(department):
     # Get the current date from the system
     get_date = datetime.now()
     # Format the date as a string in the order: last two digits of the year, two digits month, and two digits day
     set_Date = get_date.strftime("%y%m%d")
 
+    if department == "CIVIL":
+        # Create civil folder with date
+        date_Folder = set_Date + " CIVIL"
+    elif department == "ARCHITECTURAL":
+        # Create architectural folder with date
+        date_Folder = set_Date + " ARCHITECTURAL"
+    elif department == "STRUCTURAL":
+        # Create structural folder with date
+        date_Folder = set_Date + " STRUCTURAL"
+    else:
+        date_Folder = ""
+    
+
     # Ensure the _SS directory exists
-    ss_directory = os.path.join(directory, "_SS")
+    ss_directory = os.path.join(directory, "_SS", date_Folder)
     os.makedirs(ss_directory, exist_ok=True)
 
     return ss_directory
@@ -49,7 +63,7 @@ def set_SS_directory(department):
 def resource_path(relative_path):
     """Get the absolute path to a resource, works for dev and for PyInstaller."""
     try:
-        # PyInstaller creates a temp folder and stores files there
+        # Creates a temp folder and stores files there
         base_path = sys._MEIPASS
     except AttributeError:
         base_path = os.path.abspath(".")
@@ -92,7 +106,7 @@ def is_Destination(d):
         input()
         sys.exit()
 
-################################################################################## CIVIL ############################################################################
+################################################################ CIVIL ############################################################################
 # THIS FUNCTION GROUPS AND ORGANISES .PDF FILES BY THEIR ALPHABETICAL VALUE INSIDE THE BRACKETS ------------------------------
 def organise_C_alphabetical():    
     # Function to extract the alphabetic value within square brackets
@@ -125,8 +139,8 @@ def organise_C_alphabetical():
             files.sort(key=lambda x: x[1])  # Sort by the extracted alphabetic value
             for i in range(len(files) - 1):
                 file_to_move = files[i][0]
-                shutil.move(os.path.join(directory, file_to_move), ss_directory)
-                print(f"Moved {file_to_move} to {ss_directory}")
+                shutil.move(os.path.join(directory, file_to_move), ss_Civil_directory)
+                print(f"Moved {file_to_move} to {ss_Civil_directory}")
 
 # THIS FUNCTION GROUPS AND ORGANISES .PDF FILES BY THEIR NUMERICAL VALUE INSIDE THE BRACKETS ---------------------------------------------
 def organise_C_numerical():
@@ -160,8 +174,8 @@ def organise_C_numerical():
             files.sort(key=lambda x: x[1])  # Sort by the extracted numeric value
             for i in range(len(files) - 1):
                 file_to_move = files[i][0]
-                shutil.move(os.path.join(directory, file_to_move), ss_directory)
-                print(f"Moved {file_to_move} to {ss_directory}")
+                shutil.move(os.path.join(directory, file_to_move), ss_Civil_directory)
+                print(f"Moved {file_to_move} to {ss_Civil_directory}")
 
 # THIS FUNCTION GROUPS, COMPARES AND ORGANISES .PDF FILES BY THEIR NUMERICAL AND ALPHABETICAL VALUE INSIDE THE BRACKETS ---------------------------------------
 def compare_C_NumAlpha():
@@ -190,9 +204,9 @@ def compare_C_NumAlpha():
             if values[0].isdigit() and values[1].isalpha():
                 # Move the file with the alphabetic value to the "_SS" folder
                 old_path = os.path.join(directory, f"{prefix}{values[1]}{suffix}")
-                new_path = os.path.join(ss_directory, f"{prefix}{values[1]}{suffix}")
+                new_path = os.path.join(ss_Civil_directory, f"{prefix}{values[1]}{suffix}")
                 shutil.move(old_path, new_path)
-                print(f"Moved {prefix}{values[1]}{suffix} to {ss_directory}")
+                print(f"Moved {prefix}{values[1]}{suffix} to {ss_Civil_directory}")
 
 ###################################################################### ARCHITECTURAL #########################################################################
 # THIS FUNCTION GROUPS AND ORGANISES .PDF FILES BY THEIR ALPHABETICAL VALUE INSIDE THE BRACKETS -------------------------------
@@ -227,8 +241,8 @@ def organise_A_alphabetical():
             files.sort(key=lambda x: x[1])  # Sort by the extracted alphabetic value
             for i in range(len(files) - 1):
                 file_to_move = files[i][0]
-                shutil.move(os.path.join(directory, file_to_move), ss_directory)
-                print(f"Moved {file_to_move} to {ss_directory}")
+                shutil.move(os.path.join(directory, file_to_move), ss_Arch_directory)
+                print(f"Moved {file_to_move} to {ss_Arch_directory}")
 
 # THIS FUNCTION GROUPS AND ORGANISES .PDF FILES BY THEIR NUMERICAL VALUE INSIDE THE BRACKETS ---------------------------------
 def organise_A_numerical():
@@ -262,8 +276,8 @@ def organise_A_numerical():
             files.sort(key=lambda x: x[1])  # Sort by the extracted numeric value
             for i in range(len(files) - 1):
                 file_to_move = files[i][0]
-                shutil.move(os.path.join(directory, file_to_move), ss_directory)
-                print(f"Moved {file_to_move} to {ss_directory}")
+                shutil.move(os.path.join(directory, file_to_move), ss_Arch_directory)
+                print(f"Moved {file_to_move} to {ss_Arch_directory}")
 
 # THIS FUNCTION GROUPS, COMPARES AND ORGANISES .PDF FILES BY THEIR NUMERICAL AND ALPHABETICAL VALUE INSIDE THE BRACKETS --------------------------
 def compare_A_NumAlpha():
@@ -292,11 +306,11 @@ def compare_A_NumAlpha():
             if values[0].isdigit() and values[1].isalpha():
                 # Move the file with the alphabetic value to the "_SS" folder
                 old_path = os.path.join(directory, f"{prefix}{values[1]}{suffix}")
-                new_path = os.path.join(ss_directory, f"{prefix}{values[1]}{suffix}")
+                new_path = os.path.join(ss_Arch_directory, f"{prefix}{values[1]}{suffix}")
                 shutil.move(old_path, new_path)
-                print(f"Moved {prefix}{values[1]}{suffix} to {ss_directory}")
+                print(f"Moved {prefix}{values[1]}{suffix} to {ss_Arch_directory}")
 
-###################################################################### STRUCTURAL ######################################################################################
+############################################################ STRUCTURAL ######################################################################################
 # THIS FUNCTION GROUPS AND ORGANISES .PDF FILES BY THEIR ALPHABETICAL VALUE INSIDE THE BRACKETS --------------------------------
 def organise_S_alphabetical():
     # Function to extract the alphabetic value within square brackets
@@ -329,8 +343,8 @@ def organise_S_alphabetical():
             files.sort(key=lambda x: x[1])  # Sort by the extracted alphabetic value
             for i in range(len(files) - 1):
                 file_to_move = files[i][0]
-                shutil.move(os.path.join(directory, file_to_move), ss_directory)
-                print(f"Moved {file_to_move} to {ss_directory}")
+                shutil.move(os.path.join(directory, file_to_move), ss_Struct_directory)
+                print(f"Moved {file_to_move} to {ss_Struct_directory}")
 
 # THIS FUNCTION GROUPS AND ORGANISES .PDF FILES BY THEIR NUMERICAL VALUE INSIDE THE BRACKETS -----------------------------------
 def organise_S_numerical():
@@ -364,8 +378,8 @@ def organise_S_numerical():
             files.sort(key=lambda x: x[1])  # Sort by the extracted numeric value
             for i in range(len(files) - 1):
                 file_to_move = files[i][0]
-                shutil.move(os.path.join(directory, file_to_move), ss_directory)
-                print(f"Moved {file_to_move} to {ss_directory}")
+                shutil.move(os.path.join(directory, file_to_move), ss_Struct_directory)
+                print(f"Moved {file_to_move} to {ss_Struct_directory}")
 
 # THIS FUNCTION GROUPS, COMPARES AND ORGANISES .PDF FILES BY THEIR NUMERICAL AND ALPHABETICAL VALUE INSIDE THE BRACKETS ---------------------------
 def compare_S_NumAlpha():
@@ -394,9 +408,9 @@ def compare_S_NumAlpha():
             if values[0].isdigit() and values[1].isalpha():
                 # Move the file with the alphabetic value to the "_SS" folder
                 old_path = os.path.join(directory, f"{prefix}{values[1]}{suffix}")
-                new_path = os.path.join(ss_directory, f"{prefix}{values[1]}{suffix}")
+                new_path = os.path.join(ss_Struct_directory, f"{prefix}{values[1]}{suffix}")
                 shutil.move(old_path, new_path)
-                print(f"Moved {prefix}{values[1]}{suffix} to {ss_directory}")
+                print(f"Moved {prefix}{values[1]}{suffix} to {ss_Struct_directory}")
 
 if __name__ == "__main__":
 
@@ -418,9 +432,9 @@ if __name__ == "__main__":
     #temp
     ss_directory = set_SS_directory()
 
-    ss_Civil_directory = set_SS_directory("civil")
-    ss_Arch_directory = set_SS_directory("architectural")
-    ss_Struct_directory = set_SS_directory("structural")
+    ss_Civil_directory = set_SS_directory("CIVIL")
+    ss_Arch_directory = set_SS_directory("ARCHITECTURAL")
+    ss_Struct_directory = set_SS_directory("STRUCTURAL")
 
     organise_C_alphabetical()
     organise_C_numerical()
