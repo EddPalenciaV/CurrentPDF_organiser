@@ -27,14 +27,6 @@ def is_currentDirectory():
     directory = os.path.join(path)
     return directory
 
-# Pattern that identifies a civil drawing
-civil_Pattern = r'-C-'
-# Pattern that identifies a architectural drawing
-arch_Pattern = r'-A-'
-# Pattern that identifies a structural drawing
-struct_Pattern = r'-S-'
-
-#TODO: Get parameter "department" to select which superseded folder will be created
 def set_SS_directory(department):
     # Get the current date from the system
     get_date = datetime.now()
@@ -51,8 +43,7 @@ def set_SS_directory(department):
         # Create structural folder with date
         date_Folder = set_Date + " STRUCTURAL"
     else:
-        date_Folder = ""
-    
+        date_Folder = ""    
 
     # Ensure the _SS directory exists
     ss_directory = os.path.join(directory, "_SS", date_Folder)
@@ -105,6 +96,125 @@ def is_Destination(d):
         print("\nThis program has stopped because this is not a valid system. \n\nDo not promote piracy!")
         input()
         sys.exit()
+
+####################################################################################
+####################################################################################
+####################################################################################
+
+#TODO: Refactor these Alpha, Num and AlphaNum functions into one function with parameters
+
+def supersede_drawings(charkey, ss_directory):    
+    
+    supersede_alphabetical(charkey, ss_directory)
+    supersede_numerical(charkey, ss_directory)
+    supersede_Num_vs_Alpha(charkey, ss_directory)
+
+def supersede_alphabetical(charkey, ss_directory):
+    # Function to extract the alphabetic value within square brackets
+    def extract_alpha_value(filename):
+        match = re.search(r'\[([a-zA-Z])\]', filename)
+        if match:
+            return match.group(1).lower()  # Convert letter to lowercase for uniform comparison
+        return None
+
+    # Function to get the base name without the value in square brackets
+    def get_base_name(filename):
+        return re.sub(r'\[[a-zA-Z]\]', '', filename)
+
+    # Dictionary to store files by their base name
+    files_dict = {}
+
+    # Iterate over files in the directory
+    for filename in os.listdir(directory):
+        if filename.endswith(".pdf") and bool(re.search(charkey, filename)):
+            value = extract_alpha_value(filename)
+            if value:
+                base_name = get_base_name(filename)
+                if base_name not in files_dict:
+                    files_dict[base_name] = []
+                files_dict[base_name].append((filename, value))
+
+    # Compare files and move according to the conditions
+    for base_name, files in files_dict.items():
+        if len(files) > 1:
+            files.sort(key=lambda x: x[1])  # Sort by the extracted alphabetic value
+            for i in range(len(files) - 1):
+                file_to_move = files[i][0]
+                shutil.move(os.path.join(directory, file_to_move), ss_directory)
+                print(f"Moved {file_to_move} to {ss_directory}")
+
+# THIS FUNCTION GROUPS AND ORGANISES .PDF FILES BY THEIR NUMERICAL VALUE INSIDE THE BRACKETS ---------------------------------------------
+def supersede_numerical(charkey, ss_directory):
+    # Function to extract the numeric value within square brackets
+    def extract_digit_value(filename):
+        match = re.search(r'\[(\d+)\]', filename)
+        if match:
+            return int(match.group(1))
+        return None
+
+    # Function to get the base name without the value in square brackets
+    def get_base_name(filename):
+        return re.sub(r'\[\d+\]', '', filename)     
+
+    # Dictionary to store files by their base name
+    files_dict = {}
+
+    # Iterate over files in the directory
+    for filename in os.listdir(directory):
+        if filename.endswith(".pdf") and bool(re.search(charkey, filename)):
+            value = extract_digit_value(filename)
+            if value is not None:
+                base_name = get_base_name(filename)
+                if base_name not in files_dict:
+                    files_dict[base_name] = []
+                files_dict[base_name].append((filename, value))
+
+    # Compare files and move according to the conditions
+    for base_name, files in files_dict.items():
+        if len(files) > 1:
+            files.sort(key=lambda x: x[1])  # Sort by the extracted numeric value
+            for i in range(len(files) - 1):
+                file_to_move = files[i][0]
+                shutil.move(os.path.join(directory, file_to_move), ss_directory)
+                print(f"Moved {file_to_move} to {ss_directory}")
+
+# THIS FUNCTION GROUPS, COMPARES AND ORGANISES .PDF FILES BY THEIR NUMERICAL AND ALPHABETICAL VALUE INSIDE THE BRACKETS ---------------------------------------
+def supersede_Num_vs_Alpha(charkey, ss_directory):
+    # Define a pattern to match the file names
+    pattern = re.compile(r"(.*\[)(.*)(\].*.pdf)")
+
+    # Initialize a dictionary to store the file names
+    files = {}
+
+    # Iterate over the files in the directory
+    for filename in os.listdir(directory):
+        # If the file is a PDF and the file name matches the pattern
+        if filename.endswith(".pdf") and bool(re.search(charkey, filename)) and pattern.match(filename):
+            # Extract the parts of the file name
+            prefix, value, suffix = pattern.match(filename).groups()
+            # Add the value to the list for this prefix and suffix
+            files.setdefault((prefix, suffix), []).append(value)
+
+    # Iterate over the file name combinations in the dictionary
+    for (prefix, suffix), values in files.items():
+        # If there are exactly two files with this prefix and suffix
+        if len(values) == 2:
+            # Sort the values so that the numeric one comes first
+            values.sort(key=str.isdigit, reverse=True)
+            # If the first value is numeric and the second is alphabetic
+            if values[0].isdigit() and values[1].isalpha():
+                # Move the file with the alphabetic value to the "_SS" folder
+                old_path = os.path.join(directory, f"{prefix}{values[1]}{suffix}")
+                new_path = os.path.join(ss_directory, f"{prefix}{values[1]}{suffix}")
+                shutil.move(old_path, new_path)
+                print(f"Moved {prefix}{values[1]}{suffix} to {ss_directory}")
+
+
+
+
+####################################################################################
+####################################################################################
+####################################################################################
 
 ################################################################ CIVIL ############################################################################
 # THIS FUNCTION GROUPS AND ORGANISES .PDF FILES BY THEIR ALPHABETICAL VALUE INSIDE THE BRACKETS ------------------------------
@@ -429,28 +539,41 @@ if __name__ == "__main__":
     
     directory = is_currentDirectory()
 
-    #temp
-    ss_directory = set_SS_directory()
+    # Pattern that identifies a civil drawing
+    civil_Pattern = r'-C-'
+    # Pattern that identifies a architectural drawing
+    arch_Pattern = r'-A-'
+    # Pattern that identifies a structural drawing
+    struct_Pattern = r'-S-'
 
-    ss_Civil_directory = set_SS_directory("CIVIL")
-    ss_Arch_directory = set_SS_directory("ARCHITECTURAL")
-    ss_Struct_directory = set_SS_directory("STRUCTURAL")
+    supersede_drawings(civil_Pattern, set_SS_directory("CIVIL"))
+    supersede_drawings(arch_Pattern, set_SS_directory("ARCHITECTURAL"))
+    supersede_drawings(struct_Pattern, set_SS_directory("STRUCTURAL"))
 
-    organise_C_alphabetical()
-    organise_C_numerical()
-    compare_C_NumAlpha()
+    #--------------------------------------------------------------------------
+    #--------------------------DELETE THIS EVENTUALLY--------------------------
 
-    organise_A_alphabetical()
-    organise_A_numerical()
-    compare_A_NumAlpha()
+    # ss_Civil_directory = set_SS_directory("CIVIL")
+    # ss_Arch_directory = set_SS_directory("ARCHITECTURAL")
+    # ss_Struct_directory = set_SS_directory("STRUCTURAL")
 
-    organise_S_alphabetical()
-    organise_S_numerical()
-    compare_S_NumAlpha()
+    # organise_C_alphabetical()
+    # organise_C_numerical()
+    # compare_C_NumAlpha()
+
+    # organise_A_alphabetical()
+    # organise_A_numerical()
+    # compare_A_NumAlpha()
+
+    # organise_S_alphabetical()
+    # organise_S_numerical()
+    # compare_S_NumAlpha()
+    #--------------------------DELETE THIS EVENTUALLY--------------------------
+    #--------------------------------------------------------------------------
     
     # Inform user
     print("Older versions of drawings have been moved to _SS folder")
 
     # Print Author
-    print("Created by Soft. Dev. Edd Palencia Vanegas \nDate: 02/08/2024 \nVersion: 4.0 \n\n Made for McVeigh Consultants")
+    print("Created by Soft. Dev. Edd Palencia Vanegas \nDate: 02/08/2024 \nVersion: 4.0")
     input()
